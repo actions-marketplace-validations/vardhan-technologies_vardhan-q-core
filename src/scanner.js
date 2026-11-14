@@ -142,7 +142,11 @@ export class CryptoScanner {
       pqcScore = 100; // Zero deprecated crypto found
     }
 
-    const fips204Compliant = pqcCount > 0 && classicalCount === 0;
+    const hasDilithium = pqcFindings.some(f => f.ruleId === 'PQC_NIST_FIPS_204_ML_DSA' || f.ruleId === 'PQC_HYBRID_CORE_DUAL_SIGNING');
+    const hasAerKepQ = pqcFindings.some(f => f.ruleId === 'PQC_AER_KEP_Q_EPOCH');
+
+    const fips204Compliant = hasDilithium && classicalCount === 0;
+    const aerKepQCompliant = hasAerKepQ;
     const doraCompliant = doraCount === 0 && (classicalCount === 0 || pqcScore >= 80);
 
     const hasFailed = (this.failOnVulnerable && (classicalCount > 0 || doraCount > 0)) ||
@@ -157,6 +161,7 @@ export class CryptoScanner {
         doraCount,
         pqcScore,
         fips204Compliant,
+        aerKepQCompliant,
         doraCompliant,
         hasFailed,
         scanDurationMs: Date.now() - startTime

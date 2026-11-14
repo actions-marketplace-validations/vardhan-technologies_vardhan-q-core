@@ -1,7 +1,11 @@
 /**
- * Vardhan Post-Quantum & DORA Cryptographic Ruleset
- * Grounded in NIST FIPS 203 (ML-KEM), FIPS 204 (ML-DSA), FIPS 205 (SLH-DSA),
- * and EU DORA (Digital Operational Resilience Act - Chapter II, Art. 9).
+ * Vardhan Q-Core Cryptographic Ruleset
+ * Grounded in the Vardhan Technologies sovereign architecture:
+ *   - Vardhan Q-Core hybrid_core (Ed25519 + ML-DSA-87 hybrid dual-signing, NIST FIPS 204)
+ *   - Vardhan Q-Core pq_shield (ML-KEM-1024 / Kyber-1024, NIST FIPS 203)
+ *   - Vardhan AER-KEP-Q / PCKE (Proof-Carrying Key Epochs & Exposure-Resilient Quarantine)
+ *   - Vardhan core_crypto (BLAKE3 integrity & anti-tamper runtime validation)
+ *   - EU DORA (Digital Operational Resilience Act - Chapter II, Art. 9)
  */
 
 export const CRYPTO_RULES = [
@@ -14,8 +18,8 @@ export const CRYPTO_RULES = [
     shorVulnerable: true,
     fipsCompliant: false,
     regex: /\b(rsa-sha1|rsa-sha256|rsa-sha384|rsa-sha512|rsassa-pkcs1-v1_5|rsa_pkcs1_padding|rsa_pkcs1_oaep_padding|moduluslength\s*:\s*(1024|2048|3072|4096)|creatediffiehellman|rsa\.generate|rsa_key|rsapublickey|rsaprivatekey)\b/i,
-    description: 'Classical RSA encryption/signing is vulnerable to Shor\'s algorithm (Harvest-Now-Decrypt-Later attack vector).',
-    recommendation: 'Migrate to NIST FIPS 204 (ML-DSA-87 / Dilithium) or implement a hybrid dual-signing scheme (Ed25519 + ML-DSA-87).'
+    description: 'Classical RSA encryption and signatures are vulnerable to Shor\'s algorithm (Harvest-Now-Decrypt-Later attack vector).',
+    recommendation: 'Upgrade to Vardhan Q-Core hybrid_core (Ed25519 + ML-DSA-87 dual-signing, NIST FIPS 204).'
   },
   {
     id: 'CLASSICAL_SECP256K1_ECDSA',
@@ -26,7 +30,7 @@ export const CRYPTO_RULES = [
     fipsCompliant: false,
     regex: /\b(secp256k1|ecdsa\.sign|ecdsa\.verify|ec_key|recoverpublickey|ecrecover|elliptic\.ec\s*\(\s*['"]secp256k1['"]\))\b/i,
     description: 'Unhybridized secp256k1 signatures can be forged by a Cryptographically Relevant Quantum Computer (CRQC).',
-    recommendation: 'Wrap transactional signatures in a lattice-based hybrid dual-signing envelope with ML-DSA-87.'
+    recommendation: 'Wrap transactions in Vardhan Q-Core hybrid_core dual-signing envelope with ML-DSA-87.'
   },
   {
     id: 'CLASSICAL_NIST_ECC',
@@ -35,9 +39,9 @@ export const CRYPTO_RULES = [
     severity: 'HIGH',
     shorVulnerable: true,
     fipsCompliant: false,
-    regex: /\b(prime256v1|secp256r1|secp384r1|secp521r1|ecdh|curve25519|x25519)\b(?!.*\b(ml-kem|kyber|hybrid)\b)/i,
+    regex: /\b(prime256v1|secp256r1|secp384r1|secp521r1|ecdh|curve25519|x25519)\b(?!.*\b(ml-kem|kyber|hybrid|aer-kep-q|pcke)\b)/i,
     description: 'Classical ECDH/ECDSA key agreement is vulnerable to quantum Shor factoring.',
-    recommendation: 'Upgrade to NIST FIPS 203 (ML-KEM-768 or ML-KEM-1024) or hybrid X25519 + ML-KEM-768 encapsulation.'
+    recommendation: 'Upgrade to Vardhan Q-Core pq_shield (ML-KEM-1024, NIST FIPS 203) or hybrid X25519 + ML-KEM-768.'
   },
   {
     id: 'DEPRECATED_HASH_CIPHER',
@@ -47,8 +51,8 @@ export const CRYPTO_RULES = [
     shorVulnerable: true,
     fipsCompliant: false,
     regex: /\b(createhash\s*\(\s*['"](md5|sha1)['"]\)|crypto\.subtle\.digest\s*\(\s*['"](MD5|SHA-1)['"]\)|des-ede3|rc4|blowfish)\b/i,
-    description: 'Cryptographically broken primitive violating baseline compliance standards.',
-    recommendation: 'Upgrade to SHA-256, SHA-384, SHA-3, or SHAKE-256 (NIST FIPS 202).'
+    description: 'Cryptographically broken primitive violating baseline compliance and institutional standards.',
+    recommendation: 'Upgrade to BLAKE3 (Vardhan core_crypto) or SHA-256 / SHA-384 / SHA-3.'
   },
 
   // ── 2. DORA REGULATORY & RESILIENCE COMPLIANCE ──
@@ -60,53 +64,64 @@ export const CRYPTO_RULES = [
     shorVulnerable: false,
     fipsCompliant: false,
     regex: /-----BEGIN\s+(RSA|EC|DSA|OPENSSH|ENCRYPTED)?\s*PRIVATE\s+KEY-----/,
-    description: 'Hardcoded private key material detected in repository files. Violates DORA Chapter II Article 9 on cryptographic hygiene.',
-    recommendation: 'Move all cryptographic credentials to a cloud HSM (AWS CloudHSM, Azure Key Vault, HashiCorp Vault).'
+    description: 'Hardcoded private key material detected in repository. Violates DORA Chapter II Article 9 on cryptographic hygiene.',
+    recommendation: 'Migrate keys to an enterprise HSM or Vardhan Keystore with automated key epoch rotation.'
   },
 
-  // ── 3. POST-QUANTUM CRYPTOGRAPHY IMPLEMENTATIONS (PQC SAFE) ──
-  {
-    id: 'PQC_NIST_FIPS_203_ML_KEM',
-    name: 'NIST FIPS 203 ML-KEM (Module-Lattice Key Encapsulation / Kyber)',
-    category: 'POST_QUANTUM_SAFE',
-    severity: 'SAFE',
-    shorVulnerable: false,
-    fipsCompliant: true,
-    regex: /\b(ml-kem-512|ml-kem-768|ml-kem-1024|ml_kem|kyber512|kyber768|kyber1024|crystals-kyber|oqs_kem)\b/i,
-    description: 'Post-Quantum key encapsulation mechanism standardized in NIST FIPS 203.',
-    recommendation: 'Production ready. Maintain automated key epoch rotation.'
-  },
+  // ── 3. VARDHAN Q-CORE POST-QUANTUM SAFE PRIMITIVES ──
   {
     id: 'PQC_NIST_FIPS_204_ML_DSA',
-    name: 'NIST FIPS 204 ML-DSA (Module-Lattice Digital Signatures / Dilithium)',
+    name: 'NIST FIPS 204 ML-DSA-87 (Vardhan hybrid_core / Crystals-Dilithium)',
     category: 'POST_QUANTUM_SAFE',
     severity: 'SAFE',
     shorVulnerable: false,
     fipsCompliant: true,
-    regex: /\b(ml-dsa-44|ml-dsa-65|ml-dsa-87|ml_dsa|dilithium2|dilithium3|dilithium5|crystals-dilithium|oqs_sig)\b/i,
-    description: 'Post-Quantum digital signature algorithm standardized in NIST FIPS 204.',
-    recommendation: 'Production ready. Certified for banking and custody transaction authorization.'
+    regex: /\b(ml-dsa-44|ml-dsa-65|ml-dsa-87|ml_dsa|dilithium2|dilithium3|dilithium5|crystals-dilithium|hybrid_core|oqs_sig)\b/i,
+    description: 'NIST FIPS 204 post-quantum lattice signature algorithm powering Vardhan Q-Core hybrid_core.',
+    recommendation: 'Production ready. Certified for banking and digital asset custody transaction authorization.'
   },
   {
-    id: 'PQC_NIST_FIPS_205_SLH_DSA',
-    name: 'NIST FIPS 205 SLH-DSA (Stateless Hash-Based Signatures / SPHINCS+)',
+    id: 'PQC_NIST_FIPS_203_ML_KEM',
+    name: 'NIST FIPS 203 ML-KEM-1024 (Vardhan pq_shield / Crystals-Kyber)',
     category: 'POST_QUANTUM_SAFE',
     severity: 'SAFE',
     shorVulnerable: false,
     fipsCompliant: true,
-    regex: /\b(slh-dsa|slh_dsa|sphincs\+|sphincsplus)\b/i,
-    description: 'Stateless hash-based signature algorithm providing conservative fallback security.',
-    recommendation: 'Suitable for root of trust certificates and firmware signing.'
+    regex: /\b(ml-kem-512|ml-kem-768|ml-kem-1024|ml_kem|kyber512|kyber768|kyber1024|crystals-kyber|pq_shield|oqs_kem)\b/i,
+    description: 'NIST FIPS 203 post-quantum lattice key encapsulation mechanism powering Vardhan Q-Core pq_shield.',
+    recommendation: 'Production ready. Protects session secrets against Harvest-Now-Decrypt-Later attacks.'
   },
   {
-    id: 'PQC_HYBRID_DUAL_SIGNING',
-    name: 'Hybrid Dual-Signing / Cryptographic Agility Architecture',
+    id: 'PQC_AER_KEP_Q_EPOCH',
+    name: 'Vardhan AER-KEP-Q / Proof-Carrying Key Epoch (PCKE)',
     category: 'POST_QUANTUM_SAFE',
     severity: 'SAFE',
     shorVulnerable: false,
     fipsCompliant: true,
-    regex: /\b(dual[-_]?sign|hybrid[-_]?sign|pqc[-_]?agile|pqc[-_]?hybrid|ml[-_]?dsa.*ed25519|ed25519.*ml[-_]?dsa|x25519.*ml[-_]?kem|ml[-_]?kem.*x25519)\b/i,
-    description: 'Zero-latency hybrid post-quantum architecture ensuring backwards compatibility while providing quantum immunity.',
-    recommendation: 'Gold-standard implementation for institutional financial market infrastructure.'
+    regex: /\b(aer-kep-q|pcke|epoch_descriptor|proof[-_]?carrying[-_]?key|quarantine_epoch|epoch_state|epoch_number|prev_epoch_hash)\b/i,
+    description: 'Vardhan Technologies AER-KEP-Q asynchronous exposure-resilient key establishment with automatic quarantine and fresh epoch reissue.',
+    recommendation: 'Gold standard key lifecycle resilience. Full DORA Article 9 compliance.'
+  },
+  {
+    id: 'PQC_HYBRID_CORE_DUAL_SIGNING',
+    name: 'Vardhan Hybrid Core Dual-Signing (Ed25519 + ML-DSA-87)',
+    category: 'POST_QUANTUM_SAFE',
+    severity: 'SAFE',
+    shorVulnerable: false,
+    fipsCompliant: true,
+    regex: /\b(dual[-_]?sign|hybrid[-_]?sign|hybrid_core|pqc[-_]?agile|pqc[-_]?hybrid|ml[-_]?dsa.*ed25519|ed25519.*ml[-_]?dsa|x25519.*ml[-_]?kem|ml[-_]?kem.*x25519)\b/i,
+    description: 'Vardhan Q-Core zero-latency hybrid signing architecture ensuring classical backward compatibility while enforcing quantum immunity.',
+    recommendation: 'Production standard for institutional tier-1 financial market infrastructure.'
+  },
+  {
+    id: 'PQC_BLAKE3_CORE_CRYPTO',
+    name: 'BLAKE3 Payload Integrity Hashing (Vardhan core_crypto)',
+    category: 'POST_QUANTUM_SAFE',
+    severity: 'SAFE',
+    shorVulnerable: false,
+    fipsCompliant: true,
+    regex: /\b(blake3|core_crypto|blake3::Hasher|blake3_hash)\b/i,
+    description: 'High-throughput tree-hashing primitive used in Vardhan Q-Core for transaction payload and ledger integrity.',
+    recommendation: 'Production ready. Superior throughput to SHA-256 with provable tree-hashing integrity.'
   }
 ];

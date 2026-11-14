@@ -1,17 +1,17 @@
-name: 'Vardhan Post-Quantum & DORA Cryptographic Gate'
-description: 'Audits codebases for deprecated classical crypto (RSA/ECC) and validates NIST FIPS 203/204 & DORA post-quantum compliance.'
-author: 'Burri Vishnu Vardhan (Vardhan Labs)'
+name: 'Vardhan Q-Core Cryptographic Gate & Security Audit'
+description: 'Official GitHub Action for Vardhan Q-Core. Audits codebases for post-quantum readiness (NIST FIPS 203 ML-KEM, FIPS 204 ML-DSA-87, AER-KEP-Q) and DORA Article 9 compliance.'
+author: 'Vardhan Technologies (Burri Vishnu Vardhan)'
 branding:
   icon: 'shield'
   color: 'blue'
 
 inputs:
   path:
-    description: 'Root directory to audit for cryptographic primitives'
+    description: 'Root directory to audit for cryptographic primitives and key agility'
     required: false
     default: '.'
   fail-on-vulnerable:
-    description: 'Fail the GitHub workflow run if critical deprecated classical algorithms are detected'
+    description: 'Fail the GitHub workflow run if critical deprecated classical algorithms (RSA/ECC) or DORA key hygiene violations are detected'
     required: false
     default: 'false'
   min-pqc-score:
@@ -31,9 +31,11 @@ outputs:
   pqc-count:
     description: 'Total number of post-quantum cryptographic primitives detected'
   fips204-compliant:
-    description: 'Whether the codebase adheres to NIST FIPS 204 ML-DSA post-quantum standards (true/false)'
+    description: 'Whether digital signatures adhere to NIST FIPS 204 ML-DSA-87 standards (true/false)'
+  aer-kep-q-compliant:
+    description: 'Whether key exchange utilizes exposure-resilient epoch lifecycle (true/false)'
   dora-compliant:
-    description: 'Whether key agility and cryptographic inventory pass DORA Article 9 resilience checks (true/false)'
+    description: 'Whether key agility and cryptographic inventory pass DORA Chapter II Article 9 resilience checks (true/false)'
   report-json:
     description: 'Full structured cryptographic audit report in JSON format'
 
