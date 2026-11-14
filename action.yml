@@ -1,0 +1,42 @@
+name: 'Vardhan Post-Quantum & DORA Cryptographic Gate'
+description: 'Audits codebases for deprecated classical crypto (RSA/ECC) and validates NIST FIPS 203/204 & DORA post-quantum compliance.'
+author: 'Burri Vishnu Vardhan (Vardhan Labs)'
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  path:
+    description: 'Root directory to audit for cryptographic primitives'
+    required: false
+    default: '.'
+  fail-on-vulnerable:
+    description: 'Fail the GitHub workflow run if critical deprecated classical algorithms are detected'
+    required: false
+    default: 'false'
+  min-pqc-score:
+    description: 'Minimum Post-Quantum Readiness Score (0-100) required to pass the gate'
+    required: false
+    default: '0'
+  ignore-paths:
+    description: 'Comma-separated directory or file patterns to ignore during scanning'
+    required: false
+    default: 'node_modules,dist,build,target,.git,coverage,vendor'
+
+outputs:
+  pqc-score:
+    description: 'Computed Post-Quantum Readiness Score (0 - 100%)'
+  classical-count:
+    description: 'Total number of vulnerable classical cryptographic primitives found'
+  pqc-count:
+    description: 'Total number of post-quantum cryptographic primitives detected'
+  fips204-compliant:
+    description: 'Whether the codebase adheres to NIST FIPS 204 ML-DSA post-quantum standards (true/false)'
+  dora-compliant:
+    description: 'Whether key agility and cryptographic inventory pass DORA Article 9 resilience checks (true/false)'
+  report-json:
+    description: 'Full structured cryptographic audit report in JSON format'
+
+runs:
+  using: 'node20'
+  main: 'index.js'

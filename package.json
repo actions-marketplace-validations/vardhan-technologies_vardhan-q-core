@@ -1,0 +1,30 @@
+{
+  "name": "vardhan-quantum-action",
+  "version": "1.0.0",
+  "description": "GitHub Action to audit codebases for deprecated classical crypto and validate NIST FIPS 203/204 & DORA post-quantum compliance.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js",
+    "scan": "node index.js"
+  },
+  "keywords": [
+    "post-quantum",
+    "pqc",
+    "cryptography",
+    "nist-fips-204",
+    "nist-fips-203",
+    "ml-kem",
+    "ml-dsa",
+    "dora",
+    "security-gate",
+    "audit",
+    "github-action"
+  ],
+  "author": "Burri Vishnu Vardhan (Vardhan Labs)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vishnuvardhanb-ctrl/vardhan-quantum-action"
+  }
+}
