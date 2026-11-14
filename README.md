@@ -1,142 +1,261 @@
-# ⚛️ Vardhan Q-Core Sovereign Cryptographic Gate
+# Vardhan Q-Core
 
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Vardhan%20Q--Core%20Gate-blue?logo=github&style=flat-square)](https://github.com/marketplace/actions/vardhan-q-core-cryptographic-gate-security-audit)
-[![Vardhan Technologies](https://img.shields.io/badge/Vardhan%20Technologies-BE%20DIFFERENT-10b981?style=flat-square)](https://vishnuvardhanburri.in)
-[![NIST FIPS 204 Compliant](https://img.shields.io/badge/NIST-FIPS%20204%20(ML--DSA--87)-emerald?style=flat-square)](https://csrc.nist.gov/pubs/fips/204/final)
-[![NIST FIPS 203 Compliant](https://img.shields.io/badge/NIST-FIPS%20203%20(ML--KEM--1024)-sky?style=flat-square)](https://csrc.nist.gov/pubs/fips/203/final)
-[![AER-KEP-Q Protocol](https://img.shields.io/badge/Vardhan-AER--KEP--Q%20(PCKE)-purple?style=flat-square)](https://vishnuvardhanburri.in)
-[![DORA Article 9](https://img.shields.io/badge/DORA-Article%209%20Resilience-purple?style=flat-square)](https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+**Post-quantum cryptographic security gate for software supply chains.**
 
-> **Vardhan Technologies · BE DIFFERENT**  
-> Continuous Post-Quantum Verification & DORA Chapter II Article 9 Assurance powered by **Vardhan Q-Core**.  
-> Audits codebases for deprecated classical primitives (RSA, unhybridized secp256k1/ECDSA, legacy hashes) susceptible to **Harvest-Now-Decrypt-Later (HNDL)** attacks and validates adherence to **Vardhan Q-Core** lattice-based hybrid dual-signing (`hybrid_core`), ML-KEM-1024 key encapsulation (`pq_shield`), and `AER-KEP-Q` exposure-resilient epoch management.
+Vardhan Q-Core is a GitHub Actions security gate that audits codebases for cryptographic compliance against NIST post-quantum standards (FIPS 203, FIPS 204), detects residual classical cryptography, validates AER-KEP-Q key epoch patterns, and enforces DORA Article 9 operational resilience controls — all within the standard CI/CD pipeline.
+
+The gate is designed for regulated enterprises, Tier-1 banks, digital asset custodians, and any institution undergoing a classical-to-post-quantum cryptographic migration.
 
 ---
 
-## 🏛️ The Vardhan Q-Core Architecture
+## Overview
 
-Vardhan Technologies delivers post-quantum security infrastructure for regulated enterprises, tier-1 banks, and high-consequence digital operations across **7 Industry Planes**:
+Classical cryptographic primitives — RSA, ECDH, ECDSA, AES-128 — are vulnerable to Cryptographically Relevant Quantum Computers (CRQCs). NIST finalised its post-quantum cryptography (PQC) standards in 2024: FIPS 203 (ML-KEM) and FIPS 204 (ML-DSA). Regulated institutions are required to begin migration planning under DORA Article 9 and emerging FCA/PRA guidance.
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                   VARDHAN Q-CORE SOVEREIGN SUBSTRATE                   │
-├────────────────────────────────────────────────────────────────────────┤
-│  • hybrid_core      Ed25519 + ML-DSA-87 Hybrid Dual-Signing (FIPS 204) │
-│  • pq_shield        ML-KEM-1024 Post-Quantum Key Encapsulation (FIPS) │
-│  • AER-KEP-Q        Proof-Carrying Key Epoch (PCKE) & Exposure Reissue │
-│  • core_crypto      BLAKE3 Payload Integrity & Anti-Tamper Runtime     │
-│  • zk_engine        Groth16 Zero-Knowledge Proof Envelopes (Circom)   │
-│  • ha_cluster       Raft-Backed Consensus & Append-Only State Ledger   │
-└────────────────────────────────────────────────────────────────────────┘
-```
-
-This GitHub Action serves as the **CI/CD Trust Boundary Gatekeeper** for development teams transitioning mission-critical repositories into quantum sovereignty.
+Vardhan Q-Core integrates this compliance check directly into the merge gate, making cryptographic posture a first-class CI/CD signal — not an afterthought in a quarterly audit.
 
 ---
 
-## ⚡ Why Post-Quantum Auditing is Mandatory Now
+## What It Checks
 
-1. **Harvest-Now-Decrypt-Later (HNDL):** Adversaries are actively capturing and archiving encrypted financial transactions, JWT authorization tokens, and bank settlement payloads today to decrypt them as soon as Cryptographically Relevant Quantum Computers (CRQCs) arrive.
-2. **NIST Final Standards (August 2024):** NIST finalized **FIPS 203 (ML-KEM)** and **FIPS 204 (ML-DSA)**. Legacy RSA (<3072 bits) and discrete-log elliptic curves are formally in migration phase-out.
-3. **DORA Article 9 Mandate:** The European Union Digital Operational Resilience Act (DORA) mandates continuous cryptographic asset inventory and proven key agility across all financial infrastructure.
+### Post-Quantum Compliance
+
+| Check | Standard | Description |
+|:---|:---|:---|
+| ML-KEM-1024 usage | NIST FIPS 203 | Key encapsulation — quantum-safe replacement for RSA/ECDH |
+| ML-DSA-87 usage | NIST FIPS 204 | Digital signatures — quantum-safe replacement for ECDSA/RSA |
+| AER-KEP-Q epoch patterns | Vardhan Q-Core | Proof-carrying key epoch with exposure detection and automatic reissue |
+| Hybrid signing patterns | RFC 8032 + FIPS 204 | Ed25519 classical + ML-DSA-87 post-quantum dual-signing |
+| BLAKE3 payload hashing | — | Cryptographic payload integrity |
+| Secure memory patterns | — | Zeroize-on-drop semantics for key material |
+
+### Classical Cryptography Detection (DORA Article 9)
+
+| Pattern | Risk |
+|:---|:---|
+| RSA key generation / encryption | Quantum-vulnerable |
+| ECDH / ECDSA | Quantum-vulnerable |
+| AES-128 | Below NIST PQC security Level 3 threshold |
+| MD5 / SHA-1 | Cryptographically broken |
+| Hardcoded private keys or secrets | Immediate operational risk |
 
 ---
 
-## 🚀 Quick Start
-
-Add this workflow to your repository in `.github/workflows/crypto-audit.yml`:
+## Usage
 
 ```yaml
-name: "Vardhan Q-Core Cryptographic Audit"
-
-on:
-  pull_request:
-    branches: [ "main", "master" ]
-  push:
-    branches: [ "main", "master" ]
-
-jobs:
-  q-core-gate:
-    name: "Vardhan Q-Core Gatekeeper"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Codebase
-        uses: actions/checkout@v4
-
-      - name: Run Vardhan Q-Core Security Gate
-        uses: vishnuvardhanb-ctrl/vardhan-quantum-action@v1
-        with:
-          path: '.'
-          fail-on-vulnerable: 'false'  # Set to 'true' to block PRs with classical RSA/ECC
-          min-pqc-score: '50'          # Require at least 50% post-quantum readiness
+- name: Vardhan Q-Core Security Gate
+  uses: vishnuvardhanburri/vardhan-q-core@v1
+  with:
+    path: '.'
+    fail_on_vulnerable: 'true'
+    min_pqc_score: '50'
 ```
 
----
+### Inputs
 
-## 📊 Action Inputs
+| Input | Required | Default | Description |
+|:---|:---|:---|:---|
+| `path` | No | `.` | Root path to scan |
+| `fail_on_vulnerable` | No | `true` | Fail the workflow if classical cryptography is detected |
+| `min_pqc_score` | No | `0` | Minimum PQC compliance score (0–100) required to pass |
 
-| Input | Description | Required | Default |
-| :--- | :--- | :--- | :--- |
-| `path` | Root directory to scan for cryptographic primitives | No | `.` |
-| `fail-on-vulnerable` | Whether to fail the workflow if deprecated classical crypto (RSA/ECC) or DORA key hygiene gaps are found | No | `'false'` |
-| `min-pqc-score` | Minimum Post-Quantum Readiness Score (0-100) required to pass the gate | No | `'0'` |
-| `ignore-paths` | Comma-separated paths to ignore during scanning | No | `'node_modules,dist,build,target,.git,coverage,vendor'` |
-
----
-
-## 📤 Action Outputs
+### Outputs
 
 | Output | Description |
-| :--- | :--- |
-| `pqc-score` | Computed Post-Quantum Readiness Score (`0` - `100%`) |
-| `classical-count` | Number of classical deprecated primitives found (RSA, unhybridized ECDSA, legacy hashes) |
-| `pqc-count` | Number of verified Post-Quantum implementations found (ML-KEM, ML-DSA, hybrid schemes) |
-| `fips204-compliant` | `'true'` if all digital signatures meet NIST FIPS 204 ML-DSA-87 standards |
-| `aer-kep-q-compliant` | `'true'` if key establishment implements exposure-resilient epoch lifecycle |
-| `dora-compliant` | `'true'` if key agility and cryptographic inventory pass DORA Article 9 checks |
-| `report-json` | Full structured JSON audit report |
+|:---|:---|
+| `pqc_score` | Integer score (0–100) representing post-quantum cryptographic coverage |
+| `classical_count` | Number of classical cryptographic instances detected |
+| `pqc_count` | Number of post-quantum cryptographic instances detected |
+| `dora_gaps` | Number of DORA Article 9 control gaps detected |
+| `report` | Path to the full Markdown audit report |
 
 ---
 
-## 🖼️ Pull Request Job Summary Example
+## Full Workflow Example
 
-When the Action runs, it automatically appends an executive summary to your GitHub Action Job Summary (`$GITHUB_STEP_SUMMARY`) and emits inline PR code review annotations:
+```yaml
+name: Cryptographic Security Gate
 
-```markdown
-## ⚛️ Vardhan Q-Core Sovereign Cryptographic Gate
-> **Vardhan Technologies · BE DIFFERENT**  
-> Continuous Post-Quantum Verification & DORA Article 9 Assurance powered by **Vardhan Q-Core**.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-### Institutional Assurance Summary
-| Verification Dimension | Assessment Result | Security Architecture |
-| :--- | :--- | :--- |
-| **Q-Core PQC Readiness Score** | 🟡 **61% (Transitioning)** | Harvest-Now-Decrypt-Later (HNDL) Risk |
-| **NIST FIPS 204 (ML-DSA-87)** | ⚠️ Non-Compliant | Vardhan `hybrid_core` Dual-Signing |
-| **AER-KEP-Q Key Lifecycle** | ✅ Active (Epoch-Resilient) | Asynchronous Exposure-Resilient Quarantine |
-| **DORA Article 9 Compliance** | ⚠️ Gaps Detected | Cryptographic Agility & Key Hygiene |
-| **Classical Deprecated Primitives** | `4` instances | Classical RSA / Unhybridized ECC |
-| **Post-Quantum Implementations** | `8` instances | ML-KEM-1024 / ML-DSA-87 / BLAKE3 |
+jobs:
+  cryptographic-audit:
+    name: Vardhan Q-Core Cryptographic Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Vardhan Q-Core Security Gate
+        id: qcore
+        uses: vishnuvardhanburri/vardhan-q-core@v1
+        with:
+          path: '.'
+          fail_on_vulnerable: 'true'
+          min_pqc_score: '50'
+
+      - name: Print Results
+        run: |
+          echo "PQC Score:        ${{ steps.qcore.outputs.pqc_score }}"
+          echo "Classical found:  ${{ steps.qcore.outputs.classical_count }}"
+          echo "PQC found:        ${{ steps.qcore.outputs.pqc_count }}"
+          echo "DORA gaps:        ${{ steps.qcore.outputs.dora_gaps }}"
 ```
 
 ---
 
-## 🏛️ Enterprise Architecture & Institutional Advisory
+## Cryptographic Rules Engine
 
-Need assistance migrating core banking systems, digital asset custody rails, or institutional MPC vaults to Vardhan Q-Core?
+The gate ships with a rules engine maintained against the Vardhan Q-Core sovereign substrate. Rules are version-controlled and auditable.
 
-* **Stage 1 Institutional Cryptographic Assessment (£21,001):**
-  * 48-hour automated & expert cryptographic inventory.
-  * Formal HNDL exposure model and cryptographic dependency map.
-  * Zero-latency hybrid architecture specification (Ed25519 + ML-DSA-87 / X25519 + ML-KEM-1024).
-* **Enterprise Production Retainer (£1.2M ARR / £5M–£15M TCV):**
-  * Turnkey production deployment of the Vardhan Q-Core platform.
-  * Raft-backed HA epoch key rotation (`AER-KEP-Q`) and DORA regulatory compliance guarantees.
+### Supported Languages and File Types
 
-**Contact:** [Burri Vishnu Vardhan](https://vishnuvardhanburri.in) | [hello@vishnulabs.com](mailto:hello@vishnulabs.com)
+The scanner traverses all source files in the target path and applies pattern matching against:
+
+- Rust (`.rs`)
+- TypeScript / JavaScript (`.ts`, `.js`, `.mjs`)
+- Python (`.py`)
+- Go (`.go`)
+- Java / Kotlin (`.java`, `.kt`)
+- C / C++ (`.c`, `.cpp`, `.h`)
+- Configuration files (`.yml`, `.yaml`, `.json`, `.toml`, `.env`)
+- Any other text file containing cryptographic identifiers
+
+### PQC Pattern Coverage
+
+```
+ML-KEM-1024, ML-KEM-768, X25519MLKEM768
+ML-DSA-87, ML-DSA-65, ML-DSA-44
+AER-KEP-Q, PCKE, pq_shield, hybrid_core
+BLAKE3, zeroize, secure_memory
+Groth16, Circom, proof-carrying
+HKDF-SHA3-512, epoch_number, encapsulate, decapsulate
+```
+
+### Classical Risk Pattern Coverage
+
+```
+RSA, rsa_generate, rsa_encrypt, rsa_decrypt
+ECDH, ECDSA, secp256k1, P-256, P-384
+AES-128, DES, 3DES, RC4, MD5, SHA-1
+createPrivateKey, generateKeyPair (without PQC context)
+Hardcoded private key patterns (-----BEGIN * PRIVATE KEY-----)
+```
 
 ---
 
-## 📄 License
+## AER-KEP-Q Detection
 
-Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
+AER-KEP-Q (Asynchronous Exposure-Resilient Key Establishment — Quarantine/Reissue) is the Vardhan Q-Core key epoch management protocol. The gate specifically validates:
+
+- Presence of epoch-bound session key derivation (HKDF with transaction_id binding)
+- Exposure detection handler registration (`on_exposure`, `on_exposure_persistent`)
+- Epoch state machine transitions (Active → Quarantined → Active N+1)
+- ML-KEM-1024 encapsulation/decapsulation pairs
+- ML-DSA-87 epoch descriptor signing
+- BLAKE3 epoch hash chaining
+
+If AER-KEP-Q patterns are present in the codebase without the full epoch lifecycle, the gate flags a DORA gap.
+
+---
+
+## Audit Report
+
+On every run, the gate produces a step summary report and a downloadable Markdown audit file containing:
+
+- Scan metadata (timestamp, files scanned, engine version)
+- PQC compliance score with breakdown
+- Classical cryptographic findings with file locations and line references
+- DORA Article 9 gap analysis
+- AER-KEP-Q pattern coverage assessment
+- Remediation guidance for each finding category
+
+The report is written to the GitHub Actions step summary and optionally uploaded as a workflow artifact for audit trail purposes.
+
+---
+
+## Security Boundary
+
+This action operates as a **diagnostic wrapper** over the Vardhan Q-Core sovereign substrate. It performs static pattern analysis on source code and configuration files. It does not:
+
+- Execute any code from the scanned repository
+- Transmit scanned code or findings to external services
+- Access secrets, environment variables, or runtime credentials
+- Modify any files in the scanned repository
+
+All scanning logic runs entirely within the GitHub Actions runner. No data leaves the CI environment.
+
+---
+
+## DORA Article 9 Alignment
+
+DORA (Digital Operational Resilience Act) Article 9 requires financial entities to maintain ICT security policies that address cryptographic controls, including key management, algorithm deprecation, and resilience to emerging threats. The Vardhan Q-Core gate supports this obligation by:
+
+- Detecting use of cryptographic algorithms scheduled for deprecation
+- Validating presence of post-quantum key encapsulation and signing
+- Identifying hardcoded key material and secret exposure risks
+- Producing a machine-readable compliance report suitable for audit evidence packages
+
+This gate does not constitute a legal compliance assessment. Use of this action does not confirm or certify DORA compliance. Formal compliance assessment must be conducted by a qualified independent assessor.
+
+---
+
+## Implementation Status
+
+| Capability | Status |
+|:---|:---|
+| PQC pattern detection (ML-KEM, ML-DSA, BLAKE3) | Implemented |
+| Classical cryptography detection | Implemented |
+| AER-KEP-Q pattern validation | Implemented |
+| DORA Article 9 gap flagging | Implemented |
+| Step summary Markdown report | Implemented |
+| GitHub annotations (file + line) | Implemented |
+| Workflow outputs (score, counts) | Implemented |
+| Multi-language support | Implemented |
+| AST-level analysis | Planned |
+| Policy-as-code rule customisation | Planned |
+| SARIF output for GitHub Code Scanning | Planned |
+
+---
+
+## Versioning
+
+This action follows semantic versioning. The `v1` tag tracks the latest stable `1.x.x` release and is updated on every non-breaking release. Pin to `v1.0.0` for a fixed version.
+
+```yaml
+uses: vishnuvardhanburri/vardhan-q-core@v1       # latest stable 1.x
+uses: vishnuvardhanburri/vardhan-q-core@v1.0.0   # pinned
+```
+
+---
+
+## About Vardhan Q-Core
+
+Vardhan Q-Core is the sovereign cryptographic substrate developed by Vardhan Technologies. The full platform includes a 35-crate Rust backend with post-quantum hybrid signing, a Raft-consensus append-only ledger, an eBPF network enforcement layer, a Groth16 ZK proof engine, and a 24-check independent trust boundary — serving Tier-1 banks, digital asset custodians, prime clearing houses, and regulated fintech operators.
+
+Stage 1 Assessment: GBP 21,001 fixed fee.
+Enterprise Retainer: GBP 1.2M ARR.
+
+---
+
+## Contact
+
+Burri Vishnu Vardhan — Founder, Vardhan Technologies
+
+- Web: https://www.vishnuvardhanburri.in
+- Mail: hello@vishnulabs.com
+- GitHub: https://github.com/vishnuvardhanburri
+
+---
+
+## License
+
+MIT License. Copyright Vardhan Technologies. See [LICENSE](LICENSE) for terms.
+
+The cryptographic rules engine, AER-KEP-Q specification, and Vardhan Q-Core platform architecture are proprietary to Vardhan Technologies. All rights reserved.
