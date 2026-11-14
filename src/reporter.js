@@ -14,7 +14,7 @@ export class ActionReporter {
     const aerBadge = summary.aerKepQCompliant ? '✅ Active (Epoch-Resilient)' : 'ℹ️ Standard / Static';
     const doraBadge = summary.doraCompliant ? '✅ Resilient (DORA Art. 9)' : '⚠️ Gaps Detected';
 
-    let markdown = `## ⚛️ Vardhan Q-Core Sovereign Cryptographic Gate\n\n`;
+    let markdown = `## Vardhan Q-Core Sovereign Cryptographic Gate\n\n`;
     markdown += `> **Vardhan Technologies · BE DIFFERENT**  \n`;
     markdown += `> Continuous Post-Quantum Verification & DORA Article 9 Assurance powered by **Vardhan Q-Core**.\n\n`;
 
@@ -30,7 +30,7 @@ export class ActionReporter {
     markdown += `| **Scanned Files** | \`${summary.scannedFilesCount}\` files (${summary.scanDurationMs}ms) | AST & Dependency Scanner |\n\n`;
 
     if (summary.classicalCount > 0) {
-      markdown += `### ⚠️ Deprecated Classical Primitives (Quantum Shor Vulnerable)\n\n`;
+      markdown += `### Deprecated Classical Primitives (Quantum Shor Vulnerable)\n\n`;
       markdown += `| File & Line | Primitive / Finding | Severity | Vardhan Q-Core Migration Path |\n`;
       markdown += `| :--- | :--- | :--- | :--- |\n`;
       for (const f of findings.classical.slice(0, 15)) {
@@ -43,23 +43,23 @@ export class ActionReporter {
     }
 
     if (findings.dora.length > 0) {
-      markdown += `### 🛑 DORA Chapter II Article 9 Violations\n\n`;
+      markdown += `### DORA Chapter II Article 9 Violations\n\n`;
       for (const d of findings.dora) {
-        markdown += `- 🔴 **${d.ruleName}** at \`${d.file}:${d.line}\`: ${d.description}\n`;
+        markdown += `- **${d.ruleName}** at \`${d.file}:${d.line}\`: ${d.description}\n`;
       }
       markdown += `\n`;
     }
 
     if (findings.pqc.length > 0) {
-      markdown += `### 🛡️ Verified Vardhan Q-Core / PQC Primitives\n\n`;
+      markdown += `### Verified Vardhan Q-Core / PQC Primitives\n\n`;
       for (const p of findings.pqc.slice(0, 6)) {
-        markdown += `- 🟢 **${p.ruleName}** at \`${p.file}:${p.line}\` — ${p.description}\n`;
+        markdown += `- **${p.ruleName}** at \`${p.file}:${p.line}\` — ${p.description}\n`;
       }
       markdown += `\n`;
     }
 
     markdown += `---\n\n`;
-    markdown += `### 🏛️ Vardhan Technologies Institutional Solutions\n`;
+    markdown += `### Vardhan Technologies Institutional Solutions\n`;
     markdown += `Vardhan Q-Core powers sovereign post-quantum security infrastructure across **7 Industry Planes**:\n`;
     markdown += `*GSIB Tier-1 Banks · Digital Asset Custody · Prime Clearing & HPC · Challenger Rails · Institutional Settlement*\n\n`;
     markdown += `- **Stage 1 Institutional Assessment (£21,001):** 48-hour automated cryptographic inventory, HNDL risk model, and hybrid architecture blueprint.\n`;
@@ -82,18 +82,26 @@ export class ActionReporter {
   }
 
   static writeOutputs(result) {
-    const { summary } = result;
+    const { summary, findings } = result;
     const outputFile = process.env.GITHUB_OUTPUT;
     if (!outputFile) return;
 
+    const doraGapsCount = findings.dora ? findings.dora.length : 0;
+
     const outputs = [
       ['pqc-score', summary.pqcScore],
+      ['pqc_score', summary.pqcScore],
       ['classical-count', summary.classicalCount],
+      ['classical_count', summary.classicalCount],
       ['pqc-count', summary.pqcCount],
+      ['pqc_count', summary.pqcCount],
+      ['dora-gaps', doraGapsCount],
+      ['dora_gaps', doraGapsCount],
       ['fips204-compliant', summary.fips204Compliant ? 'true' : 'false'],
       ['aer-kep-q-compliant', summary.aerKepQCompliant ? 'true' : 'false'],
       ['dora-compliant', summary.doraCompliant ? 'true' : 'false'],
-      ['report-json', JSON.stringify(result)]
+      ['report-json', JSON.stringify(result)],
+      ['report', 'vardhan-qcore-audit.md']
     ];
 
     for (const [k, v] of outputs) {

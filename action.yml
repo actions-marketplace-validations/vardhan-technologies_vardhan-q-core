@@ -1,6 +1,6 @@
-name: 'Vardhan Q-Core Cryptographic Gate & Security Audit'
-description: 'Official GitHub Action for Vardhan Q-Core. Audits codebases for post-quantum readiness (NIST FIPS 203 ML-KEM, FIPS 204 ML-DSA-87, AER-KEP-Q) and DORA Article 9 compliance.'
-author: 'Vardhan Technologies (Burri Vishnu Vardhan)'
+name: 'Vardhan Q-Core'
+description: 'Post-quantum cryptographic security gate auditing codebases for NIST FIPS 203/204 and DORA compliance.'
+author: 'Burri Vishnu Vardhan'
 branding:
   icon: 'shield'
   color: 'blue'
@@ -10,34 +10,50 @@ inputs:
     description: 'Root directory to audit for cryptographic primitives and key agility'
     required: false
     default: '.'
-  fail-on-vulnerable:
-    description: 'Fail the GitHub workflow run if critical deprecated classical algorithms (RSA/ECC) or DORA key hygiene violations are detected'
+  fail_on_vulnerable:
+    description: 'Fail the GitHub workflow run if critical deprecated classical algorithms (RSA/ECC) are detected'
     required: false
     default: 'false'
-  min-pqc-score:
+  fail-on-vulnerable:
+    description: 'Alias for fail_on_vulnerable'
+    required: false
+    default: 'false'
+  min_pqc_score:
     description: 'Minimum Post-Quantum Readiness Score (0-100) required to pass the gate'
     required: false
     default: '0'
-  ignore-paths:
+  min-pqc-score:
+    description: 'Alias for min_pqc_score'
+    required: false
+    default: '0'
+  ignore_paths:
     description: 'Comma-separated directory or file patterns to ignore during scanning'
+    required: false
+    default: 'node_modules,dist,build,target,.git,coverage,vendor'
+  ignore-paths:
+    description: 'Alias for ignore_paths'
     required: false
     default: 'node_modules,dist,build,target,.git,coverage,vendor'
 
 outputs:
-  pqc-score:
+  pqc_score:
     description: 'Computed Post-Quantum Readiness Score (0 - 100%)'
-  classical-count:
+  pqc-score:
+    description: 'Alias for pqc_score'
+  classical_count:
     description: 'Total number of vulnerable classical cryptographic primitives found'
-  pqc-count:
+  classical-count:
+    description: 'Alias for classical_count'
+  pqc_count:
     description: 'Total number of post-quantum cryptographic primitives detected'
-  fips204-compliant:
-    description: 'Whether digital signatures adhere to NIST FIPS 204 ML-DSA-87 standards (true/false)'
-  aer-kep-q-compliant:
-    description: 'Whether key exchange utilizes exposure-resilient epoch lifecycle (true/false)'
-  dora-compliant:
-    description: 'Whether key agility and cryptographic inventory pass DORA Chapter II Article 9 resilience checks (true/false)'
-  report-json:
-    description: 'Full structured cryptographic audit report in JSON format'
+  pqc-count:
+    description: 'Alias for pqc_count'
+  dora_gaps:
+    description: 'Number of DORA Article 9 compliance gaps detected'
+  dora-gaps:
+    description: 'Alias for dora_gaps'
+  report:
+    description: 'Path to full structured cryptographic audit report'
 
 runs:
   using: 'node20'
