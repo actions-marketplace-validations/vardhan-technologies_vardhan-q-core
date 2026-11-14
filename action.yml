@@ -1,6 +1,6 @@
 name: 'Vardhan Q-Core'
-description: 'Post-quantum cryptographic security gate auditing codebases for NIST FIPS 203/204 and DORA compliance.'
-author: 'Burri Vishnu Vardhan'
+description: 'Sovereign post-quantum cryptographic discovery engine, CycloneDX 1.6 CBOM generator, and DORA Article 9 compliance auditor.'
+author: 'Vardhan Technologies'
 branding:
   icon: 'shield'
   color: 'blue'
@@ -11,7 +11,7 @@ inputs:
     required: false
     default: '.'
   fail_on_vulnerable:
-    description: 'Fail the GitHub workflow run if critical deprecated classical algorithms (RSA/ECC) are detected'
+    description: 'Fail the workflow if critical quantum-vulnerable classical algorithms (RSA/ECC) are detected'
     required: false
     default: 'false'
   fail-on-vulnerable:
@@ -44,16 +44,24 @@ outputs:
     description: 'Total number of vulnerable classical cryptographic primitives found'
   classical-count:
     description: 'Alias for classical_count'
+  quantum_vulnerable_count:
+    description: 'Number of quantum-vulnerable assets detected'
   pqc_count:
     description: 'Total number of post-quantum cryptographic primitives detected'
   pqc-count:
     description: 'Alias for pqc_count'
-  dora_gaps:
-    description: 'Number of DORA Article 9 compliance gaps detected'
-  dora-gaps:
-    description: 'Alias for dora_gaps'
-  report:
-    description: 'Path to full structured cryptographic audit report'
+  cbom_file:
+    description: 'Path to generated CycloneDX 1.6 Cryptographic Bill of Materials (cbom.json)'
+  cbom-file:
+    description: 'Alias for cbom_file'
+  sarif_file:
+    description: 'Path to generated OASIS SARIF 2.1.0 security report (results.sarif)'
+  sarif-file:
+    description: 'Alias for sarif_file'
+  report_file:
+    description: 'Path to full structured JSON audit inventory (report.json)'
+  report-file:
+    description: 'Alias for report_file'
 
 runs:
   using: 'node20'
