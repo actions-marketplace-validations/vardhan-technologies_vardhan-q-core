@@ -9,6 +9,44 @@
 
 ---
 
+## Plans & Pricing: Institutional Tiering
+
+| Dimension | Community & CI/CD Tier | Stage 1 Institutional Assessment | Enterprise Q-Core Retainer |
+| :--- | :--- | :--- | :--- |
+| **Pricing** | **Free ($0 / forever)** | **£21,001 (Fixed Fee)** | **£1.2M ARR (£5M–£15M TCV)** |
+| **Target Audience** | Open-source devs, security engineers, CI/CD pipelines | CISOs, CTOs, Enterprise Risk Committees, Regulated Entities | Tier-1 GSIBs, Digital Custodians, Clearing Houses, Challenger Rails |
+| **Delivery Model** | Automated GitHub Action | 4-week dedicated technical audit & executive briefing | Full production substrate deployment & ongoing engineering SLA |
+| **Static Code Audit** | Included (AST recursive scanning) | Deep manual + automated AST & dependencies review | Continuous automated supply-chain governance |
+| **DORA Article 9 Mapping** | Step Summary violation flags | Comprehensive regulatory compliance evidentiary matrix | Production-grade DORA operational resilience enforcement |
+| **Post-Quantum Coverage** | NIST FIPS 203 & 204 pattern detection | Tailored PQC migration roadmap & threat model | Production `hybrid_core` (Ed25519 + ML-DSA-87) integration |
+| **Key Lifecycle Security** | AER-KEP-Q pattern audit | Exposure risk modeling & quarantine review | Production AER-KEP-Q (ML-KEM-1024 + HKDF session derivation) |
+| **Ledger & Kernel Security** | N/A | Architecture gap review | Raft-backed HA ledger + Linux eBPF kernel packet isolation |
+| **Executive Briefing** | N/A | Board-ready C-suite risk presentation | Dedicated 24/7 technical advisory & SLA |
+
+---
+
+## Institutional Transparency & Security Assurance
+
+Modeled on the highest institutional transparency standards (governing DORA Article 9, SOC 2, and ISO 27001 readiness):
+
+### 1. Zero Exfiltration Guarantee (Strict Data Privacy)
+- **100% Local Execution:** All static scanning, pattern analysis, and score computations execute strictly within your ephemeral GitHub Actions runner memory.
+- **Zero Remote Telemetry:** No source code, file contents, environment variables, git history, or audit findings are ever transmitted to Vardhan Technologies or any external third-party server.
+- **No Secret Access:** The scanner requires zero GitHub secrets, zero write permissions to external networks, and zero elevated access tokens.
+
+### 2. Operational Environment & Sandboxing
+- **Ephemeral Lifecycle:** Once your GitHub Actions workflow completes, all scanner memory is discarded by the runner. No persistent files or background processes remain.
+- **Read-Only Analysis:** The Action operates in strict read-only mode over the scanned directory tree. It never modifies, refactors, or deletes repository files.
+- **Dependency Isolation:** Zero external network calls are made during the scanning lifecycle. The engine functions completely offline inside isolated VPC or air-gapped enterprise self-hosted runners.
+
+### 3. Regulatory & Cryptographic Alignment
+- **DORA Chapter II Article 9:** Automates cryptographic inventory tracking and deprecation alerts for legacy algorithms across software components.
+- **NIST FIPS 203 (ML-KEM):** Verifies lattice-based key encapsulation mechanisms for quantum-resistant session key distribution.
+- **NIST FIPS 204 (ML-DSA):** Audits digital signature schemes to prevent forgery by Shor's algorithm.
+- **Target Assurance Frameworks:** Controls structured to support independent attestation under SOC 2 Type II, ISO 27001, and Cyber Essentials Plus.
+
+---
+
 ## The Executive Problem: Why You Must Upgrade Today
 
 ### 1. The Store Now, Decrypt Later (SNDL) Threat Vector
@@ -106,6 +144,7 @@ jobs:
 | `path` | No | `.` | Target directory or repository root to recursively analyze. |
 | `fail_on_vulnerable` | No | `true` | **Recommended `true` for regulated environments.** Fails the CI/CD job immediately if unmitigated classical cryptography (RSA, ECC, deprecated hashes) is detected. |
 | `min_pqc_score` | No | `0` | Minimum cryptographic score (0–100) required to merge code. Tier-1 banks target `≥75`. |
+| `ignore_paths` | No | `node_modules,dist,build,target...` | Comma-separated directory or file patterns to ignore during scanning. |
 
 ---
 
