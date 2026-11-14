@@ -239,7 +239,7 @@ Vardhan Technologies partners directly with Chief Information Security Officers,
 ### Direct Executive Inquiries
 * **Principal:** Burri Vishnu Vardhan, Founder & Chief Architect
 * **Executive Office:** [hello@vishnulabs.com](mailto:hello@vishnulabs.com)
-* **Technical Portal:** [vishnuvardhanburri.in](https://www.vishnuvardhanburri.in)
+* **Technical Portal:** [vishnuvardhanburri.in](https://vardhantech.vercel.app)
 * **Enterprise Registry:** London, United Kingdom
 
 ---
