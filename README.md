@@ -121,7 +121,7 @@ jobs:
 
       - name: Execute Vardhan Q-Core Gate
         id: qcore
-        uses: vishnuvardhanburri/vardhan-q-core@v1
+        uses: vardhan-technologies/vardhan-q-core@v1
         with:
           path: '.'
           fail_on_vulnerable: 'true'
